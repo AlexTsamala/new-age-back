@@ -15,13 +15,13 @@ export const createUser = async(request,response) => {
     const {firstName,lastName,birthday,email,password} = value;
     const id = uuidv4();
     const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(password,salt);
-    // await pool.query({
-    //     text:`INSERT INTO "Users"
-    //     (id,"firstName","lastName",birthday,email,password)
-    //     VALUES ($1, $2,$3,$4,$5,$6);`,
-    //     values:[id,firstName,lastName,birthday,email,hashedPassword]
-    // })
+    const hashedPassword = await bcrypt.hash(password,salt);
+    await pool.query({
+        text:`INSERT INTO "Users"
+        (id,"firstName","lastName",birthday,email,password)
+        VALUES ($1, $2,$3,$4,$5,$6);`,
+        values:[id,firstName,lastName,birthday,email,hashedPassword]
+    })
 
     return response.status(201).send("User was created successfully");
 }
