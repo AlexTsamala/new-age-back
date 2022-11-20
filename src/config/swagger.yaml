@@ -40,3 +40,27 @@ paths:
       responses:
         '200':
           description: Create User
+
+  paths:
+  /auth/sign-in:
+    post:
+      tags: 
+      -  auth
+      requestBody:
+        description: user login
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              email: 123Bh@newage.io
+              password: 123Bh   
+      responses:
+        '200':
+          description: user login
