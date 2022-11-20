@@ -59,18 +59,25 @@ export const logIn = async (request,response) => {
 
 export const userData = async (request,response) => {
     const tokenBearer = request.headers.authorization;
-    // let payload = {
-    //     "firstName":firstName,
-    //     "lastName":lastName,
-    //     "id":id,
-    //     "email":email,
-    //     "birthday":birthday
-    // }
-    // const token = jwt.sign(payload,jwtSecretKey);
-    // return response.status(201).json( {
-    //     token,
-    //     expireDate: new Date(),
-    //   })
+    const UsersToken = tokenBearer.split(" ")[1];
+    const usernameId = JSON.parse(atob(UsersToken.split('.')[1])).id;
+    const usersData = await pool.query({
+        text:`SELECT * FROM "Users" WHERE id='${usernameId}' ;`
+    });
+    const {firstName,lastName,birthday,email} = usersData.rows[0];
+    let jwtSecretKey = process.env.JWT_SECRET_KEY;
+    let payload = {
+        "firstName":firstName,
+        "lastName":lastName,
+        "id":id,
+        "email":email,
+        "birthday":birthday
+    }
+    const token = jwt.sign(payload,jwtSecretKey);
+    return response.status(201).json( {
+        token,
+        expireDate: new Date(),
+    })
 }
 
 export const updateUser = async (request,response) => {
@@ -91,5 +98,23 @@ export const updateUser = async (request,response) => {
       })
 
     return response.status(201).send(updatedInfo.rows[0]);
+}
+
+export const deleteUser = async (request,response) => {
+    const {userId} = request.params;
+
+    const result = await pool.query({
+        text:`SELECT id FROM "Users" WHERE id='${userId}';`
+       });
+    
+    if(result.rowCount === 0) {
+        return response.status(400).send("User not found");
+    }  
+    
+    await pool.query({
+        text:`DELETE FROM "Users" WHERE "id"='${userId}';`,
+    })
+
+    return response.status(201).send("User was deleted successfully");
 }
 

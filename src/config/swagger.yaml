@@ -107,3 +107,23 @@ paths:
       responses:
         '200':
           description: add user
+
+    delete:
+      tags:
+        - auth
+      parameters:
+        - in: path
+          name: userId
+          schema: 
+            type: string
+            example: fe400d80-1bc9-4097-8437-17fc666d17d4
+          required: true 
+      responses:
+        '200':
+          description: Successfully fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string         
