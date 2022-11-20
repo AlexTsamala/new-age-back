@@ -7,3 +7,36 @@ info:
 servers:
 - url: "http://localhost:4001/api"
   description: local server
+
+paths:
+  /auth/sign-up:
+    post:
+      tags: 
+      -  auth
+      requestBody:
+        description: Create User
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                birthday:
+                  type: date
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              firstName: alex
+              lastName: rodriguez
+              birthday: 1998/15/02
+              email: 123Bh@newage.io   
+              password: 123Bh   
+      responses:
+        '200':
+          description: Create User
