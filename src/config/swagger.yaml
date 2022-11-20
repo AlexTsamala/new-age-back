@@ -41,7 +41,6 @@ paths:
         '200':
           description: Create User
 
-  paths:
   /auth/sign-in:
     post:
       tags: 
@@ -64,3 +63,47 @@ paths:
       responses:
         '200':
           description: user login
+
+  /auth/me:
+    get:
+      tags:
+        - auth
+      responses:
+        '200':
+          description: Successfully fetched
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /users/{userId} :
+    put:
+      tags:
+        - auth
+      parameters:
+        - in: path
+          name: userId
+          schema: 
+            type: string
+            example: d3d4d7c1-4934-43b7-b67f-9e40b999c34f
+          required: true 
+      requestBody:
+        description: add user
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+            example:
+              firstName: Jason
+              lastName: Williams   
+      responses:
+        '200':
+          description: add user

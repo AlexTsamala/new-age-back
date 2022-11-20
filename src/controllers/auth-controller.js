@@ -57,3 +57,39 @@ export const logIn = async (request,response) => {
       })
 }
 
+export const userData = async (request,response) => {
+    const tokenBearer = request.headers.authorization;
+    // let payload = {
+    //     "firstName":firstName,
+    //     "lastName":lastName,
+    //     "id":id,
+    //     "email":email,
+    //     "birthday":birthday
+    // }
+    // const token = jwt.sign(payload,jwtSecretKey);
+    // return response.status(201).json( {
+    //     token,
+    //     expireDate: new Date(),
+    //   })
+}
+
+export const updateUser = async (request,response) => {
+    const {userId} = request.params;
+    const {firstName,lastName} = request.body;
+    const checkUser = await pool.query({
+        text:`SELECT email FROM "Users" WHERE id='${userId}'`,
+      })
+    if(checkUser.rowCount===0){
+        return response.status(401).send("Can't find user");
+    }
+    await pool.query({
+        text:`UPDATE "Users" SET "firstName"='${firstName}',"lastName"='${lastName}' WHERE id='${userId}'`,
+    })
+
+    const updatedInfo = await pool.query({
+        text:`SELECT "firstName","lastName",id FROM "Users" WHERE id='${userId}'`,
+      })
+
+    return response.status(201).send(updatedInfo.rows[0]);
+}
+
