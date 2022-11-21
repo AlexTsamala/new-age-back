@@ -13,12 +13,13 @@ export const createUser = async(request,response) => {
     const validator = await authValidation(body);
     const {value,error} = validator.validate(body);
     if(error){
-        return response.status(401).json(error.details.me);
-      }
+        return response.status(401).json(error.details);
+    }
     const {firstName,lastName,birthday,email,password} = value;
     const id = uuidv4();
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password,salt);
+    
     await pool.query({
         text:`INSERT INTO "Users"
         (id,"firstName","lastName",birthday,email,password)
@@ -36,7 +37,7 @@ export const logIn = async (request,response) => {
     })
     const checkedPassword =await bcrypt.compare(password,hashedPassword.rowCount > 0 ? hashedPassword.rows[0].password : "");
     if(!checkedPassword){
-      return response.status(400).json("Password or email is incorrect");
+      return response.status(401).json("Password or email is incorrect");
     }
     const userInfo = await pool.query({
         text:`SELECT * FROM "Users" WHERE email='${email}'`,
@@ -59,6 +60,9 @@ export const logIn = async (request,response) => {
 
 export const userData = async (request,response) => {
     const tokenBearer = request.headers.authorization;
+    if(!tokenBearer){
+        return response.status(401).send("Unauthorized");
+    }
     const UsersToken = tokenBearer.split(" ")[1];
     const usernameId = JSON.parse(atob(UsersToken.split('.')[1])).id;
     const usersData = await pool.query({
@@ -69,18 +73,22 @@ export const userData = async (request,response) => {
     let payload = {
         "firstName":firstName,
         "lastName":lastName,
-        "id":id,
+        "id":usernameId,
         "email":email,
         "birthday":birthday
     }
     const token = jwt.sign(payload,jwtSecretKey);
     return response.status(201).json( {
-        token,
+        token,     
         expireDate: new Date(),
     })
 }
 
 export const updateUser = async (request,response) => {
+    const tokenBearer = request.headers.authorization;
+    if(!tokenBearer){
+        return response.status(401).send("Unauthorized");
+    }
     const {userId} = request.params;
     const {firstName,lastName} = request.body;
     const checkUser = await pool.query({
@@ -101,8 +109,11 @@ export const updateUser = async (request,response) => {
 }
 
 export const deleteUser = async (request,response) => {
+    const tokenBearer = request.headers.authorization;
+    if(!tokenBearer){
+        return response.status(401).send("Unauthorized");
+    }
     const {userId} = request.params;
-
     const result = await pool.query({
         text:`SELECT id FROM "Users" WHERE id='${userId}';`
        });

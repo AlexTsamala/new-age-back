@@ -30,11 +30,11 @@ const authValidation = async () => {
             "any.required":"Mail is required"
         }),
 
-        password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+        password: Joi.string().min(3).pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
         .required()
         .messages({
             "string.base":"Password should be string",
-            "string.pattern":"Password should contain at least 3 characters",
+            "string.min":"Password should contain at least 3 characters",
             "string.pattern":"Password should contain English letters and numbers only",
             "any.required":"Password is required"
         }),

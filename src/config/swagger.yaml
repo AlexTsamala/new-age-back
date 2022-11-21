@@ -8,6 +8,13 @@ servers:
 - url: "http://localhost:4001/api"
   description: local server
 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
   /auth/sign-up:
     post:
@@ -44,9 +51,9 @@ paths:
   /auth/sign-in:
     post:
       tags: 
-      -  auth
+        -  auth
       requestBody:
-        description: user login
+        description: JWT bearer authorization
         required: true
         content: 
           application/json:
@@ -62,12 +69,14 @@ paths:
               password: 123Bh   
       responses:
         '200':
-          description: user login
+          description: login successfully
 
   /auth/me:
     get:
       tags:
         - auth
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successfully fetched
@@ -82,6 +91,8 @@ paths:
     put:
       tags:
         - auth
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: userId
@@ -90,7 +101,7 @@ paths:
             example: d3d4d7c1-4934-43b7-b67f-9e40b999c34f
           required: true 
       requestBody:
-        description: add user
+        description: Change user
         required: true
         content: 
           application/json:
@@ -106,11 +117,13 @@ paths:
               lastName: Williams   
       responses:
         '200':
-          description: add user
+          description: User was changed successfully 
 
     delete:
       tags:
         - auth
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: userId
