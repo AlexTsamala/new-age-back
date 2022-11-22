@@ -8,7 +8,6 @@ import  jwt  from "jsonwebtoken";
 dotenv.config();
 
 export const createUser = async(request,response) => {
-
     const {body} = request;
     const validator = await authValidation(body);
     const {value,error} = validator.validate(body);
@@ -27,7 +26,9 @@ export const createUser = async(request,response) => {
         values:[id,firstName,lastName,birthday,email,hashedPassword]
     })
 
-    return response.status(201).send("User was created successfully");
+    return response.status(201).json({
+        success:true
+    });
 }
 
 export const logIn = async (request,response) => {
@@ -37,7 +38,9 @@ export const logIn = async (request,response) => {
     })
     const checkedPassword =await bcrypt.compare(password,hashedPassword.rowCount > 0 ? hashedPassword.rows[0].password : "");
     if(!checkedPassword){
-      return response.status(401).json("Password or email is incorrect");
+      return response.status(401).json({
+        success:false
+      });
     }
     const userInfo = await pool.query({
         text:`SELECT * FROM "Users" WHERE email='${email}'`,
@@ -55,6 +58,7 @@ export const logIn = async (request,response) => {
     return response.status(201).json( {
         token,
         expireDate: new Date(),
+        success:true
       })
 }
 
